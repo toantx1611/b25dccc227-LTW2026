@@ -18,6 +18,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [bookmarks, setBookmarks] = useState([]);
+  const [playerName, setPlayerName] = useState('');
 
   useEffect(() => {
     document.documentElement.dataset.build = BUILD_TAG;
@@ -48,8 +49,21 @@ const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="play" element={<Play />} />
+        <Route
+          index
+          element={<Home playerName={playerName} setPlayerName={setPlayerName} />}
+        />
+        <Route
+          path="play"
+          element={
+            <Play
+              questions={questions}
+              loading={loading}
+              error={error}
+              playerName={playerName}
+            />
+          }
+        />
         <Route path="result" element={<Result />} />
         <Route path="history" element={<History />} />
         <Route
