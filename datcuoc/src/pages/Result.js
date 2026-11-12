@@ -3,6 +3,14 @@ import { formatScore } from '../data';
 import { getResult } from '../utils';
 import ScoreChart from '../components/ScoreChart';
 
+const EMOJIS = {
+  'Thắng lớn': '🏆',
+  'Có lãi': '📈',
+  'Hòa vốn': '🤝',
+  'Thua lỗ': '📉',
+  'Cháy túi': '💸',
+};
+
 const Result = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -10,16 +18,18 @@ const Result = () => {
   if (!state) return <Navigate to="/" replace />;
 
   const { name, rounds, finalScore, correctCount, reason } = state;
+  const rating = getResult(finalScore);
 
   return (
     <div className="result">
+      <div className="result-emoji">{EMOJIS[rating]}</div>
       <h2>{reason === 'bankrupt' ? 'Bạn đã cháy túi!' : 'Bạn đã hoàn thành 12 câu.'}</h2>
 
       <div className="card summary">
         <p>Người chơi: <strong>{name}</strong></p>
         <p>Số câu trả lời đúng: {correctCount}/{rounds.length}</p>
         <p>Điểm cuối: {formatScore(finalScore)}</p>
-        <p>Đánh giá: <strong>{getResult(finalScore)}</strong></p>
+        <p>Đánh giá: <strong>{rating}</strong></p>
       </div>
 
       <div className="card">

@@ -13,11 +13,34 @@ import QuestionBank from './pages/QuestionBank';
 import QuestionDetail from './pages/QuestionDetail';
 import NotFound from './pages/NotFound';
 
+const BOOKMARKS_KEY = 'ltw_cuoc_bookmarks';
+const HISTORY_KEY = 'ltw_cuoc_history';
+
+// Đọc mảng từ localStorage, lỗi hoặc sai dạng thì trả về mảng rỗng
+const loadList = (key) => {
+  try {
+    const raw = localStorage.getItem(key);
+    const value = raw ? JSON.parse(raw) : [];
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveList = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // bỏ qua nếu không ghi được
+  }
+};
+
 const App = () => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [bookmarks, setBookmarks] = useState([]);
+  const [bookmarks, setBookmarks] = useState(() => loadList(BOOKMARKS_KEY));
+  const [history, setHistory] = useState(() => loadList(HISTORY_KEY));
   const [playerName, setPlayerName] = useState('');
 
   useEffect(() => {
@@ -40,18 +63,31 @@ const App = () => {
     return () => controller.abort();
   }, []);
 
+  // Ghi lại localStorage mỗi khi thay đổi
+  useEffect(() => saveList(BOOKMARKS_KEY, bookmarks), [bookmarks]);
+  useEffect(() => saveList(HISTORY_KEY, history), [history]);
+
   const toggleBookmark = (id) => {
     setBookmarks((prev) =>
       prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]
     );
   };
 
+  const addHistory = (record) => setHistory((prev) => [...prev, record]);
+  const clearHistory = () => setHistory([]);
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route
           index
-          element={<Home playerName={playerName} setPlayerName={setPlayerName} />}
+          element={
+            <Home
+              playerName={playerName}
+              setPlayerName={setPlayerName}
+              history={history}
+            />
+          }
         />
         <Route
           path="play"
@@ -61,11 +97,15 @@ const App = () => {
               loading={loading}
               error={error}
               playerName={playerName}
+              onFinish={addHistory}
             />
           }
         />
         <Route path="result" element={<Result />} />
-        <Route path="history" element={<History />} />
+        <Route
+          path="history"
+          element={<History history={history} clearHistory={clearHistory} />}
+        />
         <Route
           path="questions"
           element={

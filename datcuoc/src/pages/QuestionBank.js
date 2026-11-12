@@ -76,7 +76,7 @@ const QuestionBank = ({ questions, loading, error, bookmarks, toggleBookmark }) 
             <tr key={q.id}>
               <td>{q.id}</td>
               <td>{q.topic}</td>
-              <td>{LEVELS[q.level]}</td>
+              <td><span className={`badge level-${q.level}`}>{LEVELS[q.level]}</span></td>
               <td>{formatMultiplier(MULTIPLIERS[q.level])}</td>
               <td>
                 <Link to={`/questions/${q.id}`}>{q.question}</Link>
